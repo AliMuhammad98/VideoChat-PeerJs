@@ -20,7 +20,7 @@ showChat.addEventListener("click", () => {
 });
 
 const user = prompt("Enter your name");
-
+const callStartTime = new Date();
 var peer = new Peer({
   host: '127.0.0.1',
   port: 3030,
@@ -119,6 +119,8 @@ text.addEventListener("keydown", (e) => {
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
+const endCall=document.querySelector("#endCallButton")
+
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
@@ -148,6 +150,33 @@ stopVideo.addEventListener("click", () => {
     stopVideo.innerHTML = html;
   }
 });
+
+//TODO Right logic for disconnect call
+endCall.addEventListener("click",()=>{
+  html = `<i class="fas fa-unlink"></i>`;
+  endCall.classList.toggle("background__red");
+  endCall.innerHTML = html;
+  const callEndTime = new Date();
+  // Calculate the total time between the call initiation and termination
+  const callDuration = callEndTime.getTime() - callStartTime.getTime();
+  // Log the call duration in seconds
+  console.log(`Call duration: ${Math.floor(callDuration / 60000)} minutes`);
+  peer.disconnect()
+  if (!videoGrid || !myVideo) {
+    console.error('Could not find video elements');
+    return;
+  }
+  if (myVideo.parentNode !== videoGrid) {
+    console.error('User video element is not a child of the video container');
+    return;
+  }
+  videoGrid.removeChild(myVideo);
+  alert(
+    "User Left The call",
+  );
+  // Emit a 'callEnded' event using Socket.IO to notify the other participant
+  socket.emit('callEnded');
+})
 
 inviteButton.addEventListener("click", (e) => {
   prompt(
