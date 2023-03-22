@@ -21,6 +21,7 @@ showChat.addEventListener("click", () => {
 
 const user = prompt("Enter your name");
 const callStartTime = new Date();
+
 var peer = new Peer({
   host: '127.0.0.1',
   port: 3030,
@@ -61,7 +62,6 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, stream);
-
     peer.on("call", (call) => {
       console.log('someone call me');
       call.answer(stream);
@@ -70,11 +70,11 @@ navigator.mediaDevices
         addVideoStream(video, userVideoStream);
       });
     });
-
     socket.on("user-connected", (userId) => {
       connectToNewUser(userId, stream);
     });
   });
+
 
 const connectToNewUser = (userId, stream) => {
   console.log('I call someone' + userId);
@@ -89,6 +89,18 @@ peer.on("open", (id) => {
   console.log('my id is' + id);
   socket.emit("join-room", ROOM_ID, id, user);
 });
+
+peer.on('disconnected', () => {
+  console.log("My loggggg")
+  // Do something when connection is closed
+  socket.emit("callEnded",undefined)
+});
+
+socket.on('call-ended',(userId)=>{
+   console.log("UserId",userId)
+   peer.destroy()
+})
+
 
 const addVideoStream = (video, stream) => {
   video.srcObject = stream;
@@ -136,6 +148,7 @@ muteButton.addEventListener("click", () => {
   }
 });
 
+
 stopVideo.addEventListener("click", () => {
   const enabled = myVideoStream.getVideoTracks()[0].enabled;
   if (enabled) {
@@ -161,21 +174,16 @@ endCall.addEventListener("click",()=>{
   const callDuration = callEndTime.getTime() - callStartTime.getTime();
   // Log the call duration in seconds
   console.log(`Call duration: ${Math.floor(callDuration / 60000)} minutes`);
-  peer.disconnect()
-  if (!videoGrid || !myVideo) {
-    console.error('Could not find video elements');
-    return;
-  }
-  if (myVideo.parentNode !== videoGrid) {
-    console.error('User video element is not a child of the video container');
-    return;
-  }
-  videoGrid.removeChild(myVideo);
-  alert(
-    "User Left The call",
-  );
-  // Emit a 'callEnded' event using Socket.IO to notify the other participant
-  socket.emit('callEnded');
+  peer.destroy()
+  // if (!videoGrid || !myVideo) {
+  //   console.error('Could not find video elements');
+  //   return;
+  // }
+  // if (myVideo.parentNode !== videoGrid) {
+  //   console.error('User video element is not a child of the video container');
+  //   return;
+  // }
+  // videoGrid.removeChild(myVideo);
 })
 
 inviteButton.addEventListener("click", (e) => {

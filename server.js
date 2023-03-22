@@ -32,13 +32,17 @@ io.on("connection", (socket) => {
     setTimeout(()=>{
       socket.to(roomId).broadcast.emit("user-connected", userId);
     }, 1000)
-    socket.on('disconnect', () =>{
-      socket.broadcast.to(roomId).emit('user-disconnected', userId);
+
+    //for disconnect feature
+    socket.on("disconnect", (reason)=>{
+      socket.broadcast.emit("user-disconnected", userId); 
   })
-  socket.on('callEnded', () => {
-    // Display a message to the user that the call has ended
-    console.log("Call is ended")
-  });
+
+  socket.on("callEnded",()=>{
+    console.log("CallEnded Event is Running")
+    io.to(roomId).emit("call-ended",userId)
+  })
+
     socket.on("message", (message) => {
       io.to(roomId).emit("createMessage", message, userName);
     });
