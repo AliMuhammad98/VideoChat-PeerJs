@@ -4,7 +4,6 @@ const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
 myVideo.muted = true;
-
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
   document.querySelector(".main__left").style.flex = "1";
@@ -61,13 +60,13 @@ navigator.mediaDevices
   })
   .then((stream) => {
     myVideoStream = stream;
-    addVideoStream(myVideo, stream);
+    addVideoStream(myVideo,stream,'myVideo');
     peer.on("call", (call) => {
       console.log('someone call me');
       call.answer(stream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
-        addVideoStream(video, userVideoStream);
+        addVideoStream(video, userVideoStream,'remoteVideo');
       });
     });
     socket.on("user-connected", (userId) => {
@@ -75,13 +74,12 @@ navigator.mediaDevices
     });
   });
 
-
 const connectToNewUser = (userId, stream) => {
   console.log('I call someone' + userId);
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
   call.on("stream", (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
+    addVideoStream(video, userVideoStream,'remoteVideo');
   });
 };
 
@@ -99,12 +97,15 @@ peer.on('disconnected', () => {
 socket.on('call-ended',(userId)=>{
    console.log("UserId",userId)
    peer.destroy()
+   const video=document.getElementById("remoteVideo").remove()
 })
 
 
-const addVideoStream = (video, stream) => {
+const addVideoStream = (video, stream,ID) => {
   video.srcObject = stream;
+  video.setAttribute('id',ID);
   video.addEventListener("loadedmetadata", () => {
+    console.log("Running Adding Media Stream")
     video.play();
     videoGrid.append(video);
   });

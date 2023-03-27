@@ -16,12 +16,9 @@ const opinions = {
 app.use("/peerjs", ExpressPeerServer(server, opinions));
 app.use(express.static("public"));
 
-
-
 app.get("/", (req, res) => {
   res.redirect(`/${uuidv4()}`);
 });
-
 
 app.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
@@ -42,7 +39,6 @@ io.on("connection", (socket) => {
     console.log("CallEnded Event is Running")
     io.to(roomId).emit("call-ended",userId)
   })
-
     socket.on("message", (message) => {
       io.to(roomId).emit("createMessage", message, userName);
     });
