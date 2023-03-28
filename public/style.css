@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
 
 :root {
-  --main-darklg: #1d2635;
+  --main-darklg: #073763;
   --main-dark: #161d29;
   --primary-color: #2f80ec;
   --main-light: #eeeeee;
@@ -45,7 +45,7 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  background-color: var(--main-dark);
+  background: #3c5d7c;
 }
 
 video {
@@ -100,6 +100,7 @@ video {
 .main__chat_window {
   flex-grow: 1;
   overflow-y: scroll;
+  background:#b5cee6;
 }
 
 .main__chat_window::-webkit-scrollbar {
@@ -111,6 +112,7 @@ video {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #c3d4e4;
 }
 
 .main__message_container > input {

@@ -21,6 +21,7 @@ showChat.addEventListener("click", () => {
 const user = prompt("Enter your name");
 const callStartTime = new Date();
 
+
 var peer = new Peer({
   host: '127.0.0.1',
   port: 3030,
@@ -99,6 +100,12 @@ socket.on('call-ended',(userId)=>{
    peer.destroy()
    const video=document.getElementById("remoteVideo").remove()
 })
+
+window.addEventListener('beforeunload', function(event) {
+  // Call a function to handle the "disconnect" event
+  peer.destroy()
+  const video=document.getElementById("remoteVideo").remove()
+});
 
 
 const addVideoStream = (video, stream,ID) => {
