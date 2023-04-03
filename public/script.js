@@ -18,13 +18,16 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = prompt("Enter your name");
+//const user = prompt("Enter your name");
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const user = urlParams.get("username");
+console.log("Username",user)
 const callStartTime = new Date();
-
 
 var peer = new Peer({
   host: '127.0.0.1',
-  port: 3030,
+  port: 9000,
   path: '/peerjs',
   config: {
     'iceServers': [
@@ -85,7 +88,7 @@ const connectToNewUser = (userId, stream) => {
 };
 
 peer.on("open", (id) => {
-  console.log('my id is' + id);
+  console.log('my id is' + id,user);
   socket.emit("join-room", ROOM_ID, id, user);
 });
 
@@ -194,10 +197,15 @@ endCall.addEventListener("click",()=>{
   // videoGrid.removeChild(myVideo);
 })
 
+const url = new URL('http://localhost:3030/1122?username=Ali');
+const path = url.pathname.replace(/\/\w+$/, '/index');
+const result = url.origin + path;
+console.log("Result",result)
+console.log(result); // Output: http://localhost:3030/index
 inviteButton.addEventListener("click", (e) => {
   prompt(
     "Copy this link and send it to people you want to meet with",
-    window.location.href
+    result
   );
 });
 

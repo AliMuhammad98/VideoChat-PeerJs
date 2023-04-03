@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
+const session = require("express-session");
 const { v4: uuidv4 } = require("uuid");
 app.set("view engine", "ejs");
 const io = require("socket.io")(server, {
@@ -8,21 +9,58 @@ const io = require("socket.io")(server, {
     origin: '*'
   }
 });
-const { ExpressPeerServer } = require("peer");
-const opinions = {
-  debug: true,
-}
+//const { ExpressPeerServer } = require("peer");
+// const opinions = {
+//   debug: true,
+// }
+const bodyParser = require('body-parser');
 
-app.use("/peerjs", ExpressPeerServer(server, opinions));
+//app.use("/peerjs", ExpressPeerServer(server, opinions));
+
+// const peerServer = ExpressPeerServer(server, {
+//   debug: true,
+//   path: '/peerjs',
+//   port: 9000
+// });
+// app.use('/peerjs', peerServer);
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(session({
+  secret: "mysecretkey",
+  resave: false,
+  saveUninitialized: true,
+}));
+
+app.get('/index',(req,res)=>{
+  res.render('index')
+})
+
+// app.post('/second', (req, res) => {
+//   const username = req.body.username;
+//   res.render('second', { username });
+// });
+ 
 
 app.get("/", (req, res) => {
   res.redirect(`/${uuidv4()}`);
 });
 
 
+app.get("/index", (req, res) => {
+  res.render("index");
+});
+
+app.post("/index", (req, res) => {
+  const { username } = req.body;
+  req.session.username = username;
+  const id="1122"
+  res.redirect(`/${id}?username=${encodeURIComponent(username)}`);
+});
+
 app.get("/:room", (req, res) => {
-  res.render("room", { roomId: req.params.room });
+  const { username } = req.session;
+  res.render("room", { roomId: req.params.room,username });
 });
 io.on("connection", (socket) => {
   socket.on("join-room", (roomId, userId, userName) => {
@@ -45,4 +83,6 @@ io.on("connection", (socket) => {
     });
   });
 });
-server.listen(process.env.PORT || 3030);
+server.listen(process.env.PORT || 3000,()=>{
+  console.log("Node Server is Running ")
+});
